@@ -42,6 +42,3 @@ Thumbs.db
 
 # Sync tool
 .sync.ffs_db
-
-# Dataset data (actual data files, not code)
-data/

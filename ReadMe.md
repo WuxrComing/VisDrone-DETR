@@ -83,6 +83,21 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.624
 Test: 1609 images, FPS=2.70, Latency=370.4ms/image (RTX 4060 Ti)
 ```
 
+### 评估器对比验证
+
+为确认新旧评估器的 AP 差异来源，对同一 checkpoint 进行了三次评估：
+
+| 评估器 | ignore 过滤 | maxDets | AP | AP_50 | AP_75 | AR@100 |
+|--------|:----------:|:-------:|-----|-------|-------|--------|
+| 旧 AI-TOD CocoEvaluator | 无 | 1500 | 0.276 | 0.481 | 0.276 | 0.498 |
+| VisdroneCocoEvaluator | **关闭** | 500 | 0.276 | 0.481 | 0.276 | 0.498 |
+| VisdroneCocoEvaluator | **开启** | 500 | 0.257 | 0.436 | 0.263 | 0.468 |
+
+**结论：**
+- 关闭 ignore 过滤时，新旧评估器的 AP / AP_50 / AP_75 / AR@100 **完全一致**（maxDets 差异无影响，因 `num_select=300` 远小于下限）
+- 开启 ignore 过滤后，AP_50 下降 0.045（0.481 → 0.436），**全部来自 ignore region 过滤**
+- VisDrone 标注中 `category_id=0` / `iscrowd=1` / `ignore=1` 的区域主要为拥挤/遮挡场景，模型在其中的检测旧评估器计为 TP（虚高），新评估器以 IoF>0.5 过滤后不计入
+
 # Dome-DETR
 
 > 模型: Baseline Dome-M vs Dome-M | 评估配置: maxDets=[1,10,100,300]

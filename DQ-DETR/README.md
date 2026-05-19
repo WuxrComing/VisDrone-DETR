@@ -65,14 +65,30 @@ DQ-DETR now uses a VisDrone-specific evaluator (`VisdroneCocoEvaluator`) aligned
 | stats count | 19 (includes LRP-Error ×5) | 13 (no LRP) |
 | ignore region filtering | None | IoF > 0.5 |
 
+### Full Evaluation Results (VisdroneCocoEvaluator)
+
+Checkpoint: `DQDETR_visdrone_36epoch_ccm_10_50_100_10cls/checkpoint0023.pth`, 1609 test images, RTX 4060 Ti.
+
+| Metric | Value | Metric | Value |
+|--------|-------|--------|-------|
+| AP @ IoU=0.50:0.95 (all) | **0.257** | AR @ maxDets=1 | 0.102 |
+| AP @ IoU=0.50 | 0.436 | AR @ maxDets=10 | 0.331 |
+| AP @ IoU=0.75 | 0.263 | AR @ maxDets=100 | 0.468 |
+| AP @ small (<32²) | 0.163 | AR @ maxDets=500 | 0.474 |
+| AP @ medium (32²~96²) | 0.342 | AR @ small (<32²) | 0.390 |
+| AP @ large (>96²) | 0.463 | AR @ medium (32²~96²) | 0.567 |
+| | | AR @ large (>96²) | 0.624 |
+
+Inference: 2.70 FPS, 370.4 ms/image.
+
 ### maxDets Verification
 
-We verified that changing `maxDets[-1]` from 500 to 1500 has **zero effect** on all metrics (AP, AR, per-area breakdown all identical to 3 decimal places). This is because the model outputs at most `num_select=300` detections per image, well below either threshold.
+We verified that changing `maxDets[-1]` from 500 to 1500 has **zero effect** on all metrics. This is because the model outputs at most `num_select=300` detections per image, well below either threshold.
 
-| Setting | AP_all | AP_50 | AP_75 | AR_100 | AR_maxDets |
-|---------|--------|-------|-------|--------|------------|
-| maxDets=500 | 0.257 | 0.436 | 0.263 | 0.468 | 0.474 |
-| maxDets=1500 | 0.257 | 0.436 | 0.263 | 0.468 | 0.474 |
+| maxDets | AP_all | AP_50 | AP_75 | AP_small | AP_medium | AP_large | AR_500 |
+|---------|--------|-------|-------|----------|-----------|----------|--------|
+| 500 | 0.257 | 0.436 | 0.263 | 0.163 | 0.342 | 0.463 | 0.474 |
+| 1500 | 0.257 | 0.436 | 0.263 | 0.163 | 0.342 | 0.463 | 0.474 |
 
 ### Why Results Differ from Old Evaluator
 

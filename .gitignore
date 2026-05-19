@@ -1,0 +1,47 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Model weights & checkpoints
+*.pth
+*.pt
+*.onnx
+*.engine
+weight/
+
+# Training outputs
+output/
+logs/
+runs/
+uavdetr_r50/exp*/
+checkpoint*.txt
+eval_*.txt
+
+# TensorBoard
+events.out.tfevents.*
+
+# Generated images (training batches, correlograms, etc.)
+*.jpg
+*.png
+
+# Logs
+*.log
+
+# IDE / Editor
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Sync tool
+.sync.ffs_db
+
+# Dataset data (actual data files, not code)
+data/

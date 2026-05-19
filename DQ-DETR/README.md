@@ -52,6 +52,33 @@ DAB-DETR | R-50 | 22.4 | 55.6 | 14.3 | 9.0 | 21.7 | 28.3 | 38.7 |
 DINO-DETR | R-50 | 25.9 | 61.3 | 17.5 | 12.7 | 25.3 | 32.0 | 39.7 | 
 DQ-DETR | R-50 | **30.5** | **69.2** | **22.7** | **15.2** | **30.9** | **36.8** | **45.5** | 
 
+## VisDrone Evaluation
+
+DQ-DETR now uses a VisDrone-specific evaluator (`VisdroneCocoEvaluator`) aligned with [Dome-DETR](https://github.com/Katie0723/Dome-DETR). The evaluator is automatically selected when `--dataset_file visdrone`.
+
+### Changes from AI-TOD Evaluator
+
+| Parameter | AI-TOD (CocoEvaluator) | VisDrone (VisdroneCocoEvaluator) |
+|-----------|----------------------|----------------------------------|
+| maxDets | [1, 100, 1500] | [1, 10, 100, 500] |
+| areaRng | all / verytiny (<8²) / tiny (8²~16²) / small (16²~32²) / medium (>32²) | all / small (<32²) / medium (32²~96²) / large (>96²) |
+| stats count | 19 (includes LRP-Error ×5) | 13 (no LRP) |
+| ignore region filtering | None | IoF > 0.5 |
+
+### maxDets Verification
+
+We verified that changing `maxDets[-1]` from 500 to 1500 has **zero effect** on all metrics (AP, AR, per-area breakdown all identical to 3 decimal places). This is because the model outputs at most `num_select=300` detections per image, well below either threshold.
+
+| Setting | AP_all | AP_50 | AP_75 | AR_100 | AR_maxDets |
+|---------|--------|-------|-------|--------|------------|
+| maxDets=500 | 0.257 | 0.436 | 0.263 | 0.468 | 0.474 |
+| maxDets=1500 | 0.257 | 0.436 | 0.263 | 0.468 | 0.474 |
+
+### Why Results Differ from Old Evaluator
+
+1. **Area ranges are remapped** — new `AP_small` covers all objects < 32² (old verytiny + tiny + small), pulling in harder-to-detect verytiny/tiny objects. New `AP_medium` is capped at 96², excluding large objects. These labels are not comparable to old AI-TOD labels.
+2. **Ignore region filtering** — VisDrone annotations contain ignore regions (`category_id=0`, `iscrowd=1`, `ignore=1`). The new evaluator filters out detections with IoF > 0.5 against these regions, reducing false positives.
+
 ## AI-TOD-v1 and AI-TOD-v2 Datasets (Don’t forget to leave us a ⭐)
 * Step 1: Download the datasets from the below link.
 ```sh

@@ -121,7 +121,7 @@ def evaluate(self):
 class VisdroneCOCOeval(COCOeval):
     def __init__(self, coco_gt, iouType='bbox'):
         super().__init__(coco_gt, iouType=iouType)
-        self.params.maxDets = [1, 10, 100, 500]
+        self.params.maxDets = [1, 10, 100, 1500]
         self.params.areaRng = [
             [0**2, 1e5**2],    # all
             [0**2, 32**2],     # small

@@ -8,7 +8,7 @@
 ## 验证集 (Val, 548 images)
 
 | Model | Backbone | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | **DQ-DETR** [1] | R-50 | **0.323** | **0.520** | **0.333** | **0.244** | **0.412** | **0.531** | **0.132** | **0.384** | **0.526** | 2.50 | 399.8 |
 | DQ-DETR (旧) [2] | R-50 | 0.359* | 0.589* | 0.366* | — | — | — | 0.136* | — | 0.578* | 6.20 | 161.4 |
 | Dome-DETR Baseline | HGNetv2-B2 | 0.378 | 0.592 | 0.397 | 0.298 | 0.481 | 0.595 | 0.139 | 0.412 | 0.549 | 15.2 | 66.0 |
@@ -58,7 +58,7 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=500 ] = 0.532
 Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=500 ] = 0.467
 Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=500 ] = 0.613
 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.706
-Val:  548 images, FPS=2.50, Latency=399.8ms/image (RTX 4060 Ti)
+Val:  548 images, FPS=6.1, Latency=161.4ms/image (RTX 4090)
 ```
 
 ## 测试集 — 新 VisdroneCocoEvaluator (Test, 1609 images)
@@ -78,12 +78,14 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=500 ] = 0.474
 Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=500 ] = 0.390
 Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=500 ] = 0.567
 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.624
-Test: 1609 images, FPS=2.70, Latency=370.4ms/image (RTX 4060 Ti)
+Test: 1609 images, FPS=6.1, Latency=161.4ms/image (RTX 4090)
 ```
 
 ### 评估器对比验证
 
-对同一 checkpoint 进行三次评估，验证新旧评估器差异来源。**注意：** 旧 AI-TOD 评估器 areaRng 为 verytiny/tiny/small/medium，新 Visdrone 评估器为 small/medium/large，**面积标签名称相同但范围完全不同**（如旧 small=16²~32² vs 新 small=<32²），因此 AP_S/M/L 不跨评估器对比。
+对同一 checkpoint 进行三次评估，验证新旧评估器差异来源。
+
+**注意：** 旧 AI-TOD 评估器 areaRng 为 verytiny/tiny/small/medium，新 Visdrone 评估器为 small/medium/large，**面积标签名称相同但范围完全不同**（如旧 small=16²~32² vs 新 small=<32²），因此 AP_S/M/L 不跨评估器对比。
 
 #### 全指标对比 (Test, 1609 images)
 

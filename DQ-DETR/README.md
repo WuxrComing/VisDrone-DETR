@@ -52,6 +52,49 @@ DAB-DETR | R-50 | 22.4 | 55.6 | 14.3 | 9.0 | 21.7 | 28.3 | 38.7 |
 DINO-DETR | R-50 | 25.9 | 61.3 | 17.5 | 12.7 | 25.3 | 32.0 | 39.7 | 
 DQ-DETR | R-50 | **30.5** | **69.2** | **22.7** | **15.2** | **30.9** | **36.8** | **45.5** | 
 
+## VisDrone Evaluation
+
+DQ-DETR now uses a VisDrone-specific evaluator (`VisdroneCocoEvaluator`) aligned with [Dome-DETR](https://github.com/Katie0723/Dome-DETR). The evaluator is automatically selected when `--dataset_file visdrone`.
+
+### Changes from AI-TOD Evaluator
+
+| Parameter | AI-TOD (CocoEvaluator) | VisDrone (VisdroneCocoEvaluator) |
+|-----------|----------------------|----------------------------------|
+| maxDets | [1, 100, 1500] | [1, 10, 100, 500] |
+| areaRng | all / verytiny (<8²) / tiny (8²~16²) / small (16²~32²) / medium (>32²) | all / small (<32²) / medium (32²~96²) / large (>96²) |
+| stats count | 19 (includes LRP-Error ×5) | 13 (no LRP) |
+| ignore region filtering | None | IoF > 0.5 |
+
+### Full Evaluation Results (VisdroneCocoEvaluator)
+
+Checkpoint: `DQDETR_visdrone_36epoch_ccm_10_50_100_10cls/checkpoint0023.pth`, 1609 test images, RTX 4060 Ti.
+
+| Metric | Value | Metric | Value |
+|--------|-------|--------|-------|
+| AP @ IoU=0.50:0.95 (all) | **0.257** | AR @ maxDets=1 | 0.102 |
+| AP @ IoU=0.50 | 0.436 | AR @ maxDets=10 | 0.331 |
+| AP @ IoU=0.75 | 0.263 | AR @ maxDets=100 | 0.468 |
+| AP @ small (<32²) | 0.163 | AR @ maxDets=500 | 0.474 |
+| AP @ medium (32²~96²) | 0.342 | AR @ small (<32²) | 0.390 |
+| AP @ large (>96²) | 0.463 | AR @ medium (32²~96²) | 0.567 |
+| | | AR @ large (>96²) | 0.624 |
+
+Inference: 2.70 FPS, 370.4 ms/image.
+
+### maxDets Verification
+
+We verified that changing `maxDets[-1]` from 500 to 1500 has **zero effect** on all metrics. This is because the model outputs at most `num_select=300` detections per image, well below either threshold.
+
+| maxDets | AP_all | AP_50 | AP_75 | AP_small | AP_medium | AP_large | AR_500 |
+|---------|--------|-------|-------|----------|-----------|----------|--------|
+| 500 | 0.257 | 0.436 | 0.263 | 0.163 | 0.342 | 0.463 | 0.474 |
+| 1500 | 0.257 | 0.436 | 0.263 | 0.163 | 0.342 | 0.463 | 0.474 |
+
+### Why Results Differ from Old Evaluator
+
+1. **Area ranges are remapped** — new `AP_small` covers all objects < 32² (old verytiny + tiny + small), pulling in harder-to-detect verytiny/tiny objects. New `AP_medium` is capped at 96², excluding large objects. These labels are not comparable to old AI-TOD labels.
+2. **Ignore region filtering** — VisDrone annotations contain ignore regions (`category_id=0`, `iscrowd=1`, `ignore=1`). The new evaluator filters out detections with IoF > 0.5 against these regions, reducing false positives.
+
 ## AI-TOD-v1 and AI-TOD-v2 Datasets (Don’t forget to leave us a ⭐)
 * Step 1: Download the datasets from the below link.
 ```sh

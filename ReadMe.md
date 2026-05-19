@@ -1,66 +1,64 @@
 # VisDrone 模型总览
 
+[toc]
+
 > **注意**: DQ-DETR 已升级为 VisDrone 专用评估器（`VisdroneCocoEvaluator`），与 Dome-DETR 对齐。
 > 评估参数: `maxDets=[1,10,100,500]`, areaRng: all/small(<32²)/medium(32²~96²)/large(>96²), 13 stats, ignore region 过滤 (IoF>0.5)。
 
 ## 验证集 (Val, 548 images)
 
 | Model | Backbone | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **DQ-DETR** | R-50 | 0.359* | 0.589* | 0.366* | — | — | — | 0.136* | — | 0.578* | 6.20 | 161.4 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **DQ-DETR** [1] | R-50 | **0.323** | **0.520** | **0.333** | **0.244** | **0.412** | **0.531** | **0.132** | **0.384** | **0.526** | 2.50 | 399.8 |
+| DQ-DETR (旧) [2] | R-50 | 0.359* | 0.589* | 0.366* | — | — | — | 0.136* | — | 0.578* | 6.20 | 161.4 |
 | Dome-DETR Baseline | HGNetv2-B2 | 0.378 | 0.592 | 0.397 | 0.298 | 0.481 | 0.595 | 0.139 | 0.412 | 0.549 | 15.2 | 66.0 |
 | Dome-DETR Dome-M | HGNetv2-B2 | 0.375 | 0.590 | 0.398 | 0.294 | 0.478 | 0.575 | 0.142 | 0.414 | 0.553 |  15.3 | 65.4 |
 | Dome-S (weight) | HGNetv2-B0 | 0.347 | 0.561 | 0.360 | 0.269 | 0.451 | 0.567 | 0.134 | 0.389 | 0.526 | 16.7 | 59.89 |
 | Dome-M (weight) | HGNetv2-B2 | 0.382 | 0.607 | 0.401 | 0.302 | 0.489 | 0.623 | 0.142 | 0.417 | 0.556 | 16.13 | 61.98 |
 | Dome-L (weight) | HGNetv2-B4 | 0.383 | 0.609 | 0.400 | 0.303 | 0.489 | 0.628 | 0.143 | 0.417 | 0.555 | 14.98 | 66.75 |
 
-> \* DQ-DETR Val 仍为旧 AI-TOD 评估器结果（maxDets=1500, areaRng=verytiny/tiny/small/medium, 无 ignore region 过滤），暂未用新评估器重跑 Val。
+> [1] 新 **VisdroneCocoEvaluator**：maxDets=[1,10,100,500], areaRng=small(<32²)/medium(32²~96²)/large(>96²), ignore region 过滤 (IoF>0.5), 13 stats，与 Dome-DETR 对齐。
+> [2] 旧 AI-TOD CocoEvaluator：maxDets=[1,100,1500], areaRng=verytiny/tiny/small/medium, 无 ignore region 过滤, 19 stats (含 LRP)。面积标签不同无法直接填入 AP_S/M/L/AR@10。
 
 ## 测试集 (Test, 1609 images)
 
 | Model | Backbone | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **DQ-DETR** | R-50 | **0.257** | **0.436** | **0.263** | **0.163** | **0.342** | **0.463** | **0.102** | **0.331** | **0.468** | 2.70 | 370.4 |
+| **DQ-DETR** [1] | R-50 | **0.257** | **0.436** | **0.263** | **0.163** | **0.342** | **0.463** | **0.102** | **0.331** | **0.468** | 2.70 | 370.4 |
+| DQ-DETR (旧) [2] | R-50 | 0.276* | 0.481* | 0.276* | — | — | — | 0.104* | — | 0.498* | 7.29 | 137.2 |
 | Dome-DETR Baseline | HGNetv2-B2 | 0.291 | 0.486 | 0.297 | 0.191 | 0.397 | 0.515 | 0.107 | 0.344 | 0.476 | 15.2 | 66.0 |
 | Dome-DETR Dome-M | HGNetv2-B2 | 0.289 | 0.485 | 0.296 | 0.191 | 0.394 | 0.515 | 0.105 | 0.343 | 0.480 | 15.3 | 65.4 |
 | Dome-S (weight) | HGNetv2-B0 | 0.266 | 0.452 | 0.270 | 0.169 | 0.369 | 0.511 | 0.101 | 0.325 | 0.452 | 16.7 | 59.89 |
 | Dome-M (weight) | HGNetv2-B2 | 0.291 | 0.489 | 0.297 | 0.190 | 0.401 | 0.528 | 0.108 | 0.347 | 0.479 | 16.13 | 61.98 |
 | Dome-L (weight) | HGNetv2-B4 | 0.293 | 0.493 | 0.298 | 0.189 | 0.401 | 0.536 | 0.109 | 0.346 | 0.477 | 14.98 | 66.75 |
 
-> DQ-DETR Test 使用新 **VisdroneCocoEvaluator** 评估（与 Dome-DETR 对齐），Val 待重跑。
-> DQ-DETR FPS/Latency 为 RTX 4060 Ti 实测，Dome-DETR 为原文报告值，不可直接对比。
+> [1] 新 **VisdroneCocoEvaluator**，参数同上。
+> [2] 旧 AI-TOD CocoEvaluator，参数同上。\* 面积标签不同无法直接填入 AP_S/M/L/AR@10。
 
 ---
 # DQ-DETR
 
-> 评估器: **VisdroneCocoEvaluator** (Test) / 旧 AI-TOD CocoEvaluator (Val)
+> 评估器: **VisdroneCocoEvaluator** (Val + Test)
 > Checkpoint: `DQDETR_visdrone_36epoch_ccm_10_50_100_10cls/checkpoint0023.pth`
 
-## 验证集 — 旧评估器 (Val, 548 images)
+## 验证集 — VisdroneCocoEvaluator (Val, 548 images)
 
 ```
 IoU metric: bbox
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=1500 ] = 0.359
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=1500 ] = 0.589
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=1500 ] = 0.366
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=verytiny | maxDets=1500 ] = 0.106
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=  tiny | maxDets=1500 ] = 0.208
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=1500 ] = 0.337
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=1500 ] = 0.480
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.136
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.578
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=1500 ] = 0.589
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=verytiny | maxDets=1500 ] = 0.294
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=  tiny | maxDets=1500 ] = 0.458
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=1500 ] = 0.582
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=1500 ] = 0.696
-Optimal LRP             @[ IoU=0.50      | area=   all | maxDets=1500 ] = 0.715
-Optimal LRP Loc         @[ IoU=0.50      | area=   all | maxDets=1500 ] = 0.180
-Optimal LRP FP          @[ IoU=0.50      | area=   all | maxDets=1500 ] = 0.340
-Optimal LRP FN          @[ IoU=0.50      | area=   all | maxDets=1500 ] = 0.448
-# Class-specific LRP-Optimal Thresholds #
- [0.366 0.347 0.347 0.38  0.368 0.363 0.314 0.272 0.285 0.346]
-Val:  548 images, FPS=6.20, Latency=161.4ms/image
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=500 ] = 0.323
+Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=500 ] = 0.520
+Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=500 ] = 0.333
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=500 ] = 0.244
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=500 ] = 0.412
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.531
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.132
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.384
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.526
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=500 ] = 0.532
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=500 ] = 0.467
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=500 ] = 0.613
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.706
+Val:  548 images, FPS=2.50, Latency=399.8ms/image (RTX 4060 Ti)
 ```
 
 ## 测试集 — 新 VisdroneCocoEvaluator (Test, 1609 images)

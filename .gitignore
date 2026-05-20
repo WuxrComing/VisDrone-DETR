@@ -14,7 +14,7 @@ weight/
 output/
 logs/
 runs/
-uavdetr_r50/exp*/
+UAV-DETR/uavdetr_r50/exp*/
 checkpoint*.txt
 eval_*.txt
 

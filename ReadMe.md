@@ -1,339 +1,66 @@
-# VisDrone 模型总览
+# VisDrone-DETR
 
-[toc]
+DETR-based tiny object detection on [VisDrone-2019-DET](https://github.com/VisDrone/VisDrone2018-DET-toolkit) — 复现与统一基准。
 
-> **注意**: DQ-DETR 已升级为 VisDrone 专用评估器（`VisdroneCocoEvaluator`），与 Dome-DETR 对齐。
-> 评估参数: `maxDets=[1,10,100,500]`, areaRng: all/small(<32²)/medium(32²~96²)/large(>96²), 13 stats, ignore region 过滤 (IoF>0.5)。
+## 子项目
 
-## 验证集 (Val, 548 images)
+| Model | Venue | Backbone | 目录 |
+|-------|-------|-----------|------|
+| **DQ-DETR** — Dynamic Query for Tiny Object Detection | ECCV 2024 | ResNet-50 | [`DQ-DETR/`](DQ-DETR/) |
+| **Dome-DETR** — Density-Oriented Feature-Query Manipulation | ACMMM 2025 | HGNetv2-B0/B2/B4 | [`Dome-DETR/`](Dome-DETR/) |
+| **UAV-DETR** — Efficient End-to-End Detection for UAV Imagery | arXiv 2025 | ResNet-18/50, EfficientFormerV2 | [`UAV-DETR/`](UAV-DETR/) |
 
-| Model | Backbone | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **DQ-DETR** [1] | R-50 | **0.323** | **0.520** | **0.333** | **0.244** | **0.412** | **0.531** | **0.132** | **0.384** | **0.526** | 2.50 | 399.8 |
-| DQ-DETR (旧) [2] | R-50 | 0.359* | 0.589* | 0.366* | — | — | — | 0.136* | — | 0.578* | 6.20 | 161.4 |
-| Dome-DETR Baseline | HGNetv2-B2 | 0.378 | 0.592 | 0.397 | 0.298 | 0.481 | 0.595 | 0.139 | 0.412 | 0.549 | 15.2 | 66.0 |
-| Dome-DETR Dome-M | HGNetv2-B2 | 0.375 | 0.590 | 0.398 | 0.294 | 0.478 | 0.575 | 0.142 | 0.414 | 0.553 |  15.3 | 65.4 |
-| Dome-S (weight) | HGNetv2-B0 | 0.347 | 0.561 | 0.360 | 0.269 | 0.451 | 0.567 | 0.134 | 0.389 | 0.526 | 16.7 | 59.89 |
-| Dome-M (weight) | HGNetv2-B2 | 0.382 | 0.607 | 0.401 | 0.302 | 0.489 | 0.623 | 0.142 | 0.417 | 0.556 | 16.13 | 61.98 |
-| Dome-L (weight) | HGNetv2-B4 | 0.383 | 0.609 | 0.400 | 0.303 | 0.489 | 0.628 | 0.143 | 0.417 | 0.555 | 14.98 | 66.75 |
+## 评估协议
 
-> [1] 新 **VisdroneCocoEvaluator**：maxDets=[1,10,100,500], areaRng=small(<32²)/medium(32²~96²)/large(>96²), ignore region 过滤 (IoF>0.5), 13 stats，与 Dome-DETR 对齐。
-> [2] 旧 AI-TOD CocoEvaluator：maxDets=[1,100,1500], areaRng=verytiny/tiny/small/medium, 无 ignore region 过滤, 19 stats (含 LRP)。面积标签不同无法直接填入 AP_S/M/L/AR@10。
+统一使用 **VisdroneCocoEvaluator**:
 
-## 测试集 (Test, 1609 images)
+- `maxDets = [1, 10, 100, 500]`
+- 面积范围: `small (<32²)`, `medium (32²–96²)`, `large (>96²)`
+- 忽略区域过滤 (IoF > 0.5)
+- 13 个 COCO-style 统计量
+- FPS/Latency 在 RTX 4090 上测量
 
-| Model | Backbone | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **DQ-DETR** [1] | R-50 | **0.257** | **0.436** | **0.263** | **0.163** | **0.342** | **0.463** | **0.102** | **0.331** | **0.468** | 2.70 | 370.4 |
-| DQ-DETR (旧) [2] | R-50 | 0.276* | 0.481* | 0.276* | — | — | — | 0.104* | — | 0.498* | 7.29 | 137.2 |
-| Dome-DETR Baseline | HGNetv2-B2 | 0.291 | 0.486 | 0.297 | 0.191 | 0.397 | 0.515 | 0.107 | 0.344 | 0.476 | 15.2 | 66.0 |
-| Dome-DETR Dome-M | HGNetv2-B2 | 0.289 | 0.485 | 0.296 | 0.191 | 0.394 | 0.515 | 0.105 | 0.343 | 0.480 | 15.3 | 65.4 |
-| Dome-S (weight) | HGNetv2-B0 | 0.266 | 0.452 | 0.270 | 0.169 | 0.369 | 0.511 | 0.101 | 0.325 | 0.452 | 16.7 | 59.89 |
-| Dome-M (weight) | HGNetv2-B2 | 0.291 | 0.489 | 0.297 | 0.190 | 0.401 | 0.528 | 0.108 | 0.347 | 0.479 | 16.13 | 61.98 |
-| Dome-L (weight) | HGNetv2-B4 | 0.293 | 0.493 | 0.298 | 0.189 | 0.401 | 0.536 | 0.109 | 0.346 | 0.477 | 14.98 | 66.75 |
+详见 [`docs/evaluation.md`](docs/evaluation.md)。
 
-> [1] 新 **VisdroneCocoEvaluator**，参数同上。
-> [2] 旧 AI-TOD CocoEvaluator，参数同上。\* 面积标签不同无法直接填入 AP_S/M/L/AR@10。
+## 结果
 
----
-# DQ-DETR
+### 验证集 (Val, 548 images, 10 classes)
 
-> 评估器: **VisdroneCocoEvaluator** (Val + Test)
-> Checkpoint: `DQDETR_visdrone_36epoch_ccm_10_50_100_10cls/checkpoint0023.pth`
+| Model | Backbone | AP | AP₅₀ | AP₇₅ | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS |
+|-------|----------|----:|-----:|-----:|-----:|-----:|-----:|-----:|------:|-------:|----:|
+| DQ-DETR | R-50 | 0.323 | 0.520 | 0.333 | 0.244 | 0.412 | 0.531 | 0.132 | 0.384 | 0.526 | 2.5 |
+| Dome-Baseline | HGNetv2-B2 | 0.378 | 0.592 | 0.397 | 0.298 | 0.481 | 0.595 | 0.139 | 0.412 | 0.549 | 15.2 |
+| Dome-M | HGNetv2-B2 | 0.375 | 0.590 | 0.398 | 0.294 | 0.478 | 0.575 | 0.142 | 0.414 | 0.553 | 15.3 |
+| Dome-S (weight) | HGNetv2-B0 | 0.347 | 0.561 | 0.360 | 0.269 | 0.451 | 0.567 | 0.134 | 0.389 | 0.526 | 16.7 |
+| Dome-M (weight) | HGNetv2-B2 | 0.382 | 0.607 | 0.401 | 0.302 | 0.489 | 0.623 | 0.142 | 0.417 | 0.556 | 16.1 |
+| Dome-L (weight) | HGNetv2-B4 | 0.383 | 0.609 | 0.400 | 0.303 | 0.489 | 0.628 | 0.143 | 0.417 | 0.555 | 15.0 |
 
-## 验证集 — VisdroneCocoEvaluator (Val, 548 images)
+### 测试集 (Test, 1609 images, 10 classes)
 
-```
-IoU metric: bbox
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=500 ] = 0.323
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=500 ] = 0.520
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=500 ] = 0.333
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=500 ] = 0.244
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=500 ] = 0.412
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.531
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.132
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.384
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.526
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=500 ] = 0.532
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=500 ] = 0.467
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=500 ] = 0.613
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.706
-Val:  548 images, FPS=6.1, Latency=161.4ms/image (RTX 4090)
-```
+| Model | Backbone | AP | AP₅₀ | AP₇₅ | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS |
+|-------|----------|----:|-----:|-----:|-----:|-----:|-----:|-----:|------:|-------:|----:|
+| DQ-DETR | R-50 | 0.257 | 0.436 | 0.263 | 0.163 | 0.342 | 0.463 | 0.102 | 0.331 | 0.468 | 2.7 |
+| Dome-Baseline | HGNetv2-B2 | 0.291 | 0.486 | 0.297 | 0.191 | 0.397 | 0.515 | 0.107 | 0.344 | 0.476 | 15.2 |
+| Dome-M | HGNetv2-B2 | 0.289 | 0.485 | 0.296 | 0.191 | 0.394 | 0.515 | 0.105 | 0.343 | 0.480 | 15.3 |
+| Dome-S (weight) | HGNetv2-B0 | 0.266 | 0.452 | 0.270 | 0.169 | 0.369 | 0.511 | 0.101 | 0.325 | 0.452 | 16.7 |
+| Dome-M (weight) | HGNetv2-B2 | 0.291 | 0.489 | 0.297 | 0.190 | 0.401 | 0.528 | 0.108 | 0.347 | 0.479 | 16.1 |
+| Dome-L (weight) | HGNetv2-B4 | 0.293 | 0.493 | 0.298 | 0.189 | 0.401 | 0.536 | 0.109 | 0.346 | 0.477 | 15.0 |
 
-## 测试集 — 新 VisdroneCocoEvaluator (Test, 1609 images)
+### 详细数据
 
-```
-IoU metric: bbox
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=500 ] = 0.257
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=500 ] = 0.436
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=500 ] = 0.263
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=500 ] = 0.163
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=500 ] = 0.342
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.463
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.102
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.331
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.468
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=500 ] = 0.474
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=500 ] = 0.390
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=500 ] = 0.567
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=500 ] = 0.624
-Test: 1609 images, FPS=6.1, Latency=161.4ms/image (RTX 4090)
-```
+每个模型的原始 COCO 评估输出及评估器对比验证见：
 
-### 评估器对比验证
+- [`docs/dq-detr.md`](docs/dq-detr.md) — DQ-DETR 完整评估 + 新旧评估器对比
+- [`docs/dome-detr.md`](docs/dome-detr.md) — Dome-DETR Baseline / Dome-M / 预训练权重 S/M/L
 
-对同一 checkpoint 进行三次评估，验证新旧评估器差异来源。
+## 致谢
 
-**注意：** 旧 AI-TOD 评估器 areaRng 为 verytiny/tiny/small/medium，新 Visdrone 评估器为 small/medium/large，**面积标签名称相同但范围完全不同**（如旧 small=16²~32² vs 新 small=<32²），因此 AP_S/M/L 不跨评估器对比。
+本项目基于以下工作：
 
-#### 全指标对比 (Test, 1609 images)
+- [**DQ-DETR**](https://github.com/hoiliu-0801/DQ-DETR) — DETR with Dynamic Query for Tiny Object Detection (ECCV 2024)
+- [**Dome-DETR**](https://github.com/RicePasteM/Dome-DETR) — Density-Oriented Feature-Query Manipulation for Efficient Tiny Object Detection (ACMMM 2025)
+- [**UAV-DETR**](https://github.com/ValiantDiligent/UAV-DETR) — Efficient End-to-End Object Detection for Unmanned Aerial Vehicle Imagery
 
-| 指标 | 旧 AI-TOD | 新 VisDrone (无过滤) | 新 VisDrone (有过滤) | 过滤影响 |
-|------|:---------:|:-------------------:|:-------------------:|:--------:|
-| AP (all) | 0.276 | 0.276 | 0.257 | −0.019 |
-| AP_50 | 0.481 | 0.481 | 0.436 | −0.045 |
-| AP_75 | 0.276 | 0.276 | 0.263 | −0.013 |
-| AP_S | — | 0.178 | 0.163 | −0.015 |
-| AP_M | — | 0.388 | 0.342 | −0.046 |
-| AP_L | — | 0.515 | 0.463 | −0.052 |
-| AR@1 | 0.104 | 0.104 | 0.102 | −0.002 |
-| AR@10 | — | 0.343 | 0.331 | −0.012 |
-| AR@100 | 0.498 | 0.498 | 0.468 | −0.030 |
-| AR@500/1500 | 0.509 | 0.509 | 0.474 | −0.035 |
-| AR_S | — | 0.421 | 0.390 | −0.031 |
-| AR_M | — | 0.631 | 0.567 | −0.064 |
-| AR_L | — | 0.714 | 0.624 | −0.090 |
+## License
 
-> 旧 AI-TOD 评估器无 AR@10、AP_S/M/L 面积定义不同无法直接填入。
-
-**结论：**
-- 关闭 ignore 过滤后，新旧评估器的 AP / AP_50 / AP_75 / AR@100 / AR_maxDets **完全一致**
-- maxDets 差异无影响：`num_select=300` 远小于 500，模型输出不被截断
-- 开启 ignore 过滤后，**所有指标均下降**，其中 AR_L 下降最大（−0.090），小目标 AP_S 下降最小（−0.015）
-- VisDrone 标注中 `category_id=0` / `iscrowd=1` / `ignore=1` 的区域主要为拥挤/遮挡场景，大目标更容易落入 ignore 区域（例如一辆车的一部分被标记为 ignore 的密集人群遮挡）
-
-# Dome-DETR
-
-> 模型: Baseline Dome-M vs Dome-M | 评估配置: maxDets=[1,10,100,300]
-
-## 验证集 (Val, 548 images, 10 classes)
-
-| Model | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| Baseline Dome-M | 0.378 | 0.592 | 0.397 | 0.298 | 0.481 | 0.595 | 0.139 | 0.412 | 0.549 | 0.818 | 1222.8 |
-| Dome-M | 0.375 | 0.590 | 0.398 | 0.294 | 0.478 | 0.575 | 0.142 | 0.414 | 0.553 | 0.777 | 1287.7 |
-
-### Baseline Dome-M — Val 原始输出
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.378
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.592
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.397
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.298
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.481
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.595
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.139
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.412
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.549
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.486
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.647
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.747
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.831
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.588
-```
-
-### Dome-M — Val 原始输出
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.375
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.590
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.398
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.294
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.478
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.575
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.142
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.414
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.553
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.490
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.648
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.733
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.838
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.594
-```
-
-## 测试集 (Test, 1609 images, 10 classes)
-
-| Model | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| Baseline Dome-M | 0.291 | 0.486 | 0.297 | 0.191 | 0.397 | 0.515 | 0.107 | 0.344 | 0.476 | 66.0 | 15.15 |
-| Dome-M | 0.289 | 0.485 | 0.296 | 0.191 | 0.394 | 0.515 | 0.105 | 0.343 | 0.480 | 65.36 | 15.3 |
-
-### Baseline Dome-M — Test 原始输出
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.291
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.486
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.297
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.191
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.397
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.515
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.107
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.344
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.476
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.396
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.595
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.697
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.770
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.498
-```
-
-### Dome-M — Test 原始输出
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.289
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.485
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.296
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.191
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.394
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.515
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.105
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.343
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.480
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.400
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.600
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.672
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.778
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.503
-```
-
-
-# Dome-DETR 预训练权重 (S/M/L)
-
-> 权重目录: `weight/dome-{s,m,l}-visdrone_converted.pth` | 评估配置: maxDets=[1,10,100,300]
-
-## 验证集 (Val, 548 images, 10 classes)
-
-| Model | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| Dome-S (HGNetv2-B0) | 0.347 | 0.561 | 0.360 | 0.269 | 0.451 | 0.567 | 0.134 | 0.389 | 0.526 | 13.05 | 76.6 |
-| Dome-M (HGNetv2-B2) | 0.382 | 0.607 | 0.401 | 0.302 | 0.489 | 0.623 | 0.142 | 0.417 | 0.556 | 12.18 | 82.1 |
-| Dome-L (HGNetv2-B4) | 0.383 | 0.609 | 0.400 | 0.303 | 0.489 | 0.628 | 0.143 | 0.417 | 0.555 | 11.91 | 83.9 |
-
-原始 COCO 输出
-
-**Dome-S**
-
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.347
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.561
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.360
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.269
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.451
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.567
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.134
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.389
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.526
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.457
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.628
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.754
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.818
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.558
-```
-
-**Dome-M**
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.382
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.607
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.401
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.302
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.489
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.623
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.142
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.417
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.556
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.494
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.655
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.773
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.848
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.596
-```
-
-**Dome-L**
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.383
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.609
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.400
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.303
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.489
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.628
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.143
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.417
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.555
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.493
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.655
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.773
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.849
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.592
-```
-
-## 测试集 (Test, 1609 images, 10 classes)
-
-| Model | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| Dome-S (HGNetv2-B0) | 0.266 | 0.452 | 0.270 | 0.169 | 0.369 | 0.511 | 0.101 | 0.325 | 0.452 | 14.90 | 67.1 |
-| Dome-M (HGNetv2-B2) | 0.291 | 0.489 | 0.297 | 0.190 | 0.401 | 0.528 | 0.108 | 0.347 | 0.479 | 13.75 | 72.7 |
-| Dome-L (HGNetv2-B4) | 0.293 | 0.493 | 0.298 | 0.189 | 0.401 | 0.536 | 0.109 | 0.346 | 0.477 | 13.41 | 74.6 |
-
-**原始 COCO 输出**
-
-**Dome-S**
-
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.266
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.452
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.270
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.169
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.369
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.511
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.101
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.325
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.452
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.368
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.576
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.670
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.747
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.468
-```
-
-**Dome-M**
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.291
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.489
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.297
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.190
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.401
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.528
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.108
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.347
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.479
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.391
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.606
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.686
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.776
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.501
-```
-
-**Dome-L**
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.293
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.493
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.298
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.189
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.401
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.536
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.109
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.346
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.477
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.387
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.601
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.687
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.774
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.494
-```
+[Apache 2.0](LICENSE)

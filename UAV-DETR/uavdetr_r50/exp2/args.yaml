@@ -1,6 +1,6 @@
 task: detect
 mode: train
-model: ./ultralytics/cfg/models/uavdetr-r50.yaml
+model: uavdetr_r50/exp2/weights/last.pt
 data: ../VisDrone.yaml
 epochs: 400
 patience: 40
@@ -79,7 +79,7 @@ dfl: 1.5
 pose: 12.0
 kobj: 1.0
 label_smoothing: 0.0
-nbs: 64
+nbs: 2
 hsv_h: 0.015
 hsv_s: 0.7
 hsv_v: 0.4

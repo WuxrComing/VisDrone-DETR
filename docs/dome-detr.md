@@ -1,10 +1,8 @@
 # Dome-DETR 详细评估
 
-> 模型: Baseline (w/o Dome) vs Dome-DETR-M | 评估配置: maxDets=[1,10,100,300]
->
-> **说明**: 二者均使用 HGNetv2-B2 骨干，Baseline 无 Dome 模块，Dome-DETR-M 有 Dome 模块，对比反映 Dome 模块效果。
+> 评估配置: maxDets=[1,10,100,300]
 
-## Baseline (w/o Dome)
+## Dome-DETR-M*
 
 ### 验证集 (Val, 548 images)
 
@@ -42,46 +40,6 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.595
 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.697
 Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.770
 Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.498
-```
-
-## Dome-DETR-M
-
-### 验证集 (Val, 548 images)
-
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.375
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.590
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.398
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.294
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.478
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.575
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.142
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.414
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.553
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.490
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.648
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.733
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.838
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.594
-```
-
-### 测试集 (Test, 1609 images)
-
-```
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.289
-Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.485
-Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.296
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.191
-Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.394
-Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.515
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.105
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.343
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.480
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=300 ] = 0.400
-Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=300 ] = 0.600
-Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=300 ] = 0.672
-Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.778
-Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.503
 ```
 
 ## Dome-DETR 预训练权重 (S / M / L)

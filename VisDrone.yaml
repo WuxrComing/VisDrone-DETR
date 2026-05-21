@@ -16,7 +16,7 @@ val: /mnt/nas/DataSet/VisDrone/VisDrone2019-DET-val/images  # val images (relati
 test: /mnt/nas/DataSet/VisDrone/VisDrone2019-DET-test-dev/images  # test images (optional)  1610 images
 annotations: annotations # including : instances_images.json  instances_test.json  instances_val.json
 # for yolov6
-anno_path: /mnt/nas/DataSet/VisDrone/annotations/instances_val.json 
+anno_path: /mnt/nas/DataSet/VisDrone/CocoAnnotation/val.json 
 
 is_coco: False
 

@@ -1,8 +1,10 @@
 # Dome-DETR 详细评估
 
-> 模型: Baseline Dome-M vs Dome-M | 评估配置: maxDets=[1,10,100,300]
+> 模型: Baseline (w/o Dome) vs Dome-DETR-M | 评估配置: maxDets=[1,10,100,300]
+>
+> **说明**: 二者均使用 HGNetv2-B2 骨干，Baseline 无 Dome 模块，Dome-DETR-M 有 Dome 模块，对比反映 Dome 模块效果。
 
-## Baseline Dome-M
+## Baseline (w/o Dome)
 
 ### 验证集 (Val, 548 images)
 
@@ -42,7 +44,7 @@ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.770
 Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.498
 ```
 
-## Dome-M
+## Dome-DETR-M
 
 ### 验证集 (Val, 548 images)
 
@@ -82,7 +84,7 @@ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.778
 Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.503
 ```
 
-## 预训练权重 (S / M / L)
+## Dome-DETR 预训练权重 (S / M / L)
 
 > 权重目录: `weight/dome-{s,m,l}-visdrone_converted.pth` | 评估配置: maxDets=[1,10,100,300]
 
@@ -90,11 +92,11 @@ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.503
 
 | Model | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Dome-S (HGNetv2-B0) | 0.347 | 0.561 | 0.360 | 0.269 | 0.451 | 0.567 | 0.134 | 0.389 | 0.526 | 13.05 | 76.6 |
-| Dome-M (HGNetv2-B2) | 0.382 | 0.607 | 0.401 | 0.302 | 0.489 | 0.623 | 0.142 | 0.417 | 0.556 | 12.18 | 82.1 |
-| Dome-L (HGNetv2-B4) | 0.383 | 0.609 | 0.400 | 0.303 | 0.489 | 0.628 | 0.143 | 0.417 | 0.555 | 11.91 | 83.9 |
+| Dome-DETR-S (HGNetv2-B0) | 0.347 | 0.561 | 0.360 | 0.269 | 0.451 | 0.567 | 0.134 | 0.389 | 0.526 | 13.05 | 76.6 |
+| Dome-DETR-M (HGNetv2-B2) | 0.382 | 0.607 | 0.401 | 0.302 | 0.489 | 0.623 | 0.142 | 0.417 | 0.556 | 12.18 | 82.1 |
+| Dome-DETR-L (HGNetv2-B4) | 0.383 | 0.609 | 0.400 | 0.303 | 0.489 | 0.628 | 0.143 | 0.417 | 0.555 | 11.91 | 83.9 |
 
-#### Dome-S Val 原始输出
+#### Dome-DETR-S Val 原始输出
 
 ```
 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.347
@@ -113,7 +115,7 @@ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.818
 Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.558
 ```
 
-#### Dome-M Val 原始输出
+#### Dome-DETR-M Val 原始输出
 
 ```
 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.382
@@ -132,7 +134,7 @@ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.848
 Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.596
 ```
 
-#### Dome-L Val 原始输出
+#### Dome-DETR-L Val 原始输出
 
 ```
 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.383
@@ -155,11 +157,11 @@ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.592
 
 | Model | AP | AP_50 | AP_75 | AP_S | AP_M | AP_L | AR@1 | AR@10 | AR@100 | FPS | Latency(ms) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Dome-S (HGNetv2-B0) | 0.266 | 0.452 | 0.270 | 0.169 | 0.369 | 0.511 | 0.101 | 0.325 | 0.452 | 14.90 | 67.1 |
-| Dome-M (HGNetv2-B2) | 0.291 | 0.489 | 0.297 | 0.190 | 0.401 | 0.528 | 0.108 | 0.347 | 0.479 | 13.75 | 72.7 |
-| Dome-L (HGNetv2-B4) | 0.293 | 0.493 | 0.298 | 0.189 | 0.401 | 0.536 | 0.109 | 0.346 | 0.477 | 13.41 | 74.6 |
+| Dome-DETR-S (HGNetv2-B0) | 0.266 | 0.452 | 0.270 | 0.169 | 0.369 | 0.511 | 0.101 | 0.325 | 0.452 | 14.90 | 67.1 |
+| Dome-DETR-M (HGNetv2-B2) | 0.291 | 0.489 | 0.297 | 0.190 | 0.401 | 0.528 | 0.108 | 0.347 | 0.479 | 13.75 | 72.7 |
+| Dome-DETR-L (HGNetv2-B4) | 0.293 | 0.493 | 0.298 | 0.189 | 0.401 | 0.536 | 0.109 | 0.346 | 0.477 | 13.41 | 74.6 |
 
-#### Dome-S Test 原始输出
+#### Dome-DETR-S Test 原始输出
 
 ```
 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.266
@@ -178,7 +180,7 @@ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.747
 Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.468
 ```
 
-#### Dome-M Test 原始输出
+#### Dome-DETR-M Test 原始输出
 
 ```
 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.291
@@ -197,7 +199,7 @@ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets=300 ] = 0.776
 Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets=300 ] = 0.501
 ```
 
-#### Dome-L Test 原始输出
+#### Dome-DETR-L Test 原始输出
 
 ```
 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=300 ] = 0.293
